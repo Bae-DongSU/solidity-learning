@@ -21,4 +21,9 @@ contract MyToken {
         totalSupply = totalSupply + amount;
         balanceOf[owner] = balanceOf[owner] + amount;
     }
+
+    function transfer(uint256 amount, address to) external {
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+    }
 }
