@@ -13,5 +13,12 @@ contract MyToken {
         name = _name;
         symbol = _symbol;
         decimals = _decimal;
+        _mint(1*10**18, msg.sender); //1MT
+        
+    }
+
+    function _mint(uint256 amount, address owner) internal {
+        totalSupply = totalSupply + amount;
+        balanceOf[owner] = balanceOf[owner] + amount;
     }
 }

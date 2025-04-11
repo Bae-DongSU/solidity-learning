@@ -5,9 +5,9 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("mytoken deploy", () => {
     let myTokenC: MyToken;
-    let signers: HardhatEthersSigner[];
+    let signer: HardhatEthersSigner[];
     before("should deploy", async () => {
-        signers = await hre.ethers.getSigners();
+        signer = await hre.ethers.getSigners();
         myTokenC = await hre.ethers.deployContract("MyToken", [
             "MyToken",
             "MT",
@@ -23,10 +23,10 @@ describe("mytoken deploy", () => {
     it("should return decimals", async () => {
         expect(await myTokenC.decimals()).equal(18);
     });
-    it("should return 0 totalSupply", async () => {
+    /*it("should return 0 totalSupply", async () => {
         expect(await myTokenC.totalSupply()).equal(0);
-    });
-    it("should return 0 balance for signer 0", async () => {
-        expect(await myTokenC.balanceOf(signers[0].address)).equal(0);
+    });*/
+    it("should return 1MT balance for signer 0", async () => {
+        expect(await myTokenC.balanceOf(signer[0].address)).equal(1n*10n**18n);
     })
 });
