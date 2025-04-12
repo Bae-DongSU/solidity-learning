@@ -59,4 +59,46 @@ describe("mytoken deploy", () => {
                 .to.be.revertedWith("insufficient error!");
         });
     });
+    describe("TransferFrom", () => {
+        it("should emit Approval event", async () => {
+            const signer1 = signer[1];
+            await expect(myTokenC.approve(signer1, hre.ethers.parseUnits("10", decimals)))
+            .to.emit(myTokenC, "Approval")
+            .withArgs(signer1.address, hre.ethers.parseUnits("10", decimals));
+        })
+        it("should be reverted with insufficient allowance error", async () => {
+            const signer0 = signer[0];
+            const signer1 = signer[1];
+            await expect(myTokenC.connect(signer1).transferFrom(
+                signer0.address,
+                signer1.address,
+                hre.ethers.parseUnits("1", decimals)
+            )).to.revertedWith("insufficient allowance");
+        });
+        it("should allow signer1 to transfer an approved amount from signer0", async () => {
+            const signer0 = signer[0];
+            const signer1 = signer[1];
+    
+            // 10 MT를 허락
+            await myTokenC.approve(signer1.address, hre.ethers.parseUnits("10", decimals));
+    
+            // signer1이 signer0의 잔액 중 5 MT를 전송
+            await expect(myTokenC.connect(signer1).transferFrom(
+                signer0.address,
+                signer1.address,
+                hre.ethers.parseUnits("5", decimals)
+            ))
+                .to.emit(myTokenC, "Transfer")
+                .withArgs(
+                    signer0.address,
+                    signer1.address,
+                    hre.ethers.parseUnits("5", decimals)
+                );
+    
+            // signer1 잔액이 5 MT가 되었는지 확인
+            expect(await myTokenC.balanceOf(signer1.address)).to.equal(
+                hre.ethers.parseUnits("5", decimals)
+            );
+        });
+    });
 });
