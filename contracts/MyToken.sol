@@ -17,7 +17,6 @@ contract MyToken {
         name = _name;
         symbol = _symbol;
         decimals = _decimal;
-        
         _mint(_amount*10**18, msg.sender); //1MT
     }
 
