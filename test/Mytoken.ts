@@ -34,7 +34,14 @@ describe("mytoken deploy", () => {
     });
     describe("Mint", () => {
         it("should return 1MT balance for signer 0", async () => {
+            const signer0 = signer[0];
             expect(await myTokenC.balanceOf(signer[0].address)).equal(MINTING_AMOUNT * 10n ** DECIMALS);
+        });
+
+        it("should return or revert when minting infinitly", async () => {
+            const signer2 = signer[2];
+            const mintingAgainAmount = hre.ethers.parseUnits("10000", DECIMALS);
+            await expect(myTokenC.connect(signer2).mint(mintingAgainAmount, signer2.address));
         });
     });
 
