@@ -20,6 +20,7 @@ describe("TinyBank", () => {
         tinyBankC = await hre.ethers.deployContract("TinyBank", [
             await myTokenC.getAddress()
         ]);
+        await myTokenC.setMgr(tinyBankC.getAddress());
     });
 
     describe("Initialized state check", () => {
@@ -37,9 +38,35 @@ describe("TinyBank", () => {
             const signer0 = signers[0];
             const stakingAmount = hre.ethers.parseUnits("50", DECIMALS);
             await myTokenC.approve(await tinyBankC.getAddress(), stakingAmount);
-;           await tinyBankC.stake(stakingAmount);
+            await tinyBankC.stake(stakingAmount);
             expect(await tinyBankC.staked(signer0.address)).equal(stakingAmount);
             expect(await myTokenC.balanceOf(tinyBankC)).equal(await tinyBankC.totalStaked());
+        });
+    });
+
+    describe("Withdraw", () => {
+        it("should return 0 staked after withdrawing total token", async () => {
+            const signer0 = signers[0];
+            const stakingAmount = hre.ethers.parseUnits("50", DECIMALS);
+            await myTokenC.approve(await tinyBankC.getAddress(), stakingAmount);
+            await tinyBankC.stake(stakingAmount);
+            await tinyBankC.withdraw(stakingAmount);
+            tinyBankC.withdraw(stakingAmount);
+            expect(await tinyBankC.staked(signer0.address)).equal(0);
+        });
+    });
+
+    describe("reward", async () => {
+        it("should reward 1MT every blocks", async () => {
+            const signer0 = signers[0];
+            const stakingAmount = hre.ethers.parseUnits("50", DECIMALS);
+            await myTokenC.approve(await tinyBankC.getAddress(), stakingAmount);
+            await tinyBankC.stake(stakingAmount);
+
+            const transferAmount = hre.ethers.parseUnits("1", DECIMALS);
+            await myTokenC.transfer(transferAmount, signer0.address);
+
+            await tinyBankC.withdraw(stakingAmount);
         });
     });
 });
